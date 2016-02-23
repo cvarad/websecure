@@ -29,4 +29,4 @@ def index():
         return render_template('index.html',
                                 data=rows)
     except:
-        return "Failed! :("
+        return "Failed :/"
