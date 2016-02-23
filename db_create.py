@@ -32,3 +32,6 @@ cur.execute("""INSERT INTO User VALUES (fname, lname, email, password, age) VALU
     ('Abigail', 'Fernandes', 'abigailferns94@gmail.com', 'imthebest', 21),
     ('Sushmita', 'Muthe', 'sush.muthe594@gmail.com', 'notinterested', 21)
 """)
+
+conn.commit()
+conn.close()
