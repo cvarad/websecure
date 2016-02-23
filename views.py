@@ -27,11 +27,7 @@ def index():
         cur.execute("""SELECT * FROM Users;""")
         rows = cur.fetchall()
         for row in rows:
-            if row['email'] == request.form['email'] and row['password'] == request.form['password']:
-                return render_template('success.html')
-            
-            else:
-                print 'Invalid credentials'
+            print row
             
         conn.close();
         return render_template('index.html',
