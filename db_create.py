@@ -15,16 +15,16 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-cur.execute("""DROP TABLE IF EXISTS Employee;""")
+cur.execute("""DROP TABLE IF EXISTS Users;""")
 
-cur.execute("""CREATE TABLE Employee (
+cur.execute("""CREATE TABLE Users (
     fname text,
     lname text,
     email text,
     password text,
     age integer);""")
 
-cur.execute("""INSERT INTO Employee (fname, lname, email, password, age) VALUES
+cur.execute("""INSERT INTO Users (fname, lname, email, password, age) VALUES
     ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 'varadrocks', 21),
     ('Varad', 'Raut', 'varadraut@gmail.com', 'smartvarad', 21),
     ('Maitri', 'Vasa', 'maitrivasa15@gmail.com', 'technorocks', 21),

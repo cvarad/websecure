@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import os
 import psycopg2
 import urlparse
@@ -20,12 +20,13 @@ def index():
         )
 
         cur = conn.cursor()
-        cur.execute("""SELECT * FROM User""")
+        cur.execute("""SELECT * FROM Users;""")
         rows = cur.fetchall()
         for row in rows:
             print row
 
         conn.close();
-        return "Connection successful"
+        return render_template('index.html',
+                                data=rows)
     except:
         return "Failed! :("
