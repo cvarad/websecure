@@ -6,7 +6,7 @@ import urlparse
 
 app = Flask(__name__)
 
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
     
@@ -40,6 +40,6 @@ def login():
         return "Failed :/"
 
       
-@app.route('/success', methods=['GET', 'POST'])
+@app.route('/success')
 def success():
     return render_template('success.html')
