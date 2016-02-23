@@ -2,9 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 import os
 import psycopg2
 import urlparse
-
-app = Flask(__name__)
-
+from app import app
 @app.route('/', methods=['GET', 'POST'])
 def index():
     urlparse.uses_netloc.append("postgres")
