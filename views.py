@@ -56,7 +56,7 @@ def login():
         cur.execute("""SELECT fname, lname, age FROM Users WHERE email=""" + request.form['email'] + """AND password=""" + request.form['password'] + """;""")
         rows = cur.fetchall();
         conn.close()
-        iflen(rows)) >= 1:
+        if len(rows)) >= 1:
             return render_template('success.html')
     
     except:
