@@ -15,7 +15,7 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-cur.execute("""DROP TABLE IF EXISTS User""")
+cur.execute("""DROP TABLE IF EXISTS Employee;""")
 
 cur.execute("""CREATE TABLE Employee (
     fname text,
