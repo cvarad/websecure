@@ -17,21 +17,20 @@ cur = conn.cursor()
 
 cur.execute("""DROP TABLE IF EXISTS User""")
 
-cur.execute("""CREATE TABLE User (
+cur.execute("""CREATE TABLE Employee (
     fname text,
     lname text,
     email text,
     password text,
-    age integer
-)""")
+    age integer);""")
 
-cur.execute("""INSERT INTO User VALUES (fname, lname, email, password, age) VALUES
+cur.execute("""INSERT INTO Employee (fname, lname, email, password, age) VALUES
     ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 'varadrocks', 21),
     ('Varad', 'Raut', 'varadraut@gmail.com', 'smartvarad', 21),
     ('Maitri', 'Vasa', 'maitrivasa15@gmail.com', 'technorocks', 21),
     ('Abigail', 'Fernandes', 'abigailferns94@gmail.com', 'imthebest', 21),
-    ('Sushmita', 'Muthe', 'sush.muthe594@gmail.com', 'notinterested', 21)
-""")
+    ('Sushmita', 'Muthe', 'sush.muthe594@gmail.com', 'notinterested', 21);""")
 
 conn.commit()
 conn.close()
+print "All done! :D holy crap this is awesome!"

@@ -25,6 +25,7 @@ def index():
         for row in rows:
             print row
 
+        conn.close();
         return "Connection successful"
     except:
         return "Failed! :("
