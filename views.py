@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     urlparse.uses_netloc.append("postgres")
     url = urlparse.urlparse(os.environ["DATABASE_URL"])
