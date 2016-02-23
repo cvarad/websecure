@@ -1,5 +1,5 @@
 import os
-#import psycopg2
+import psycopg2
 import urlparse
 
 urlparse.uses_netloc.append("postgres")

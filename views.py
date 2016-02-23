@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 import os
-#import psycopg2
+import psycopg2
 import urlparse
 
 
