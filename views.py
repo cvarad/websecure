@@ -28,7 +28,7 @@ def index():
         rows = cur.fetchall()
         for row in rows:
             if row[2] == request.form['email'] and row[3] == request.form['password']:
-                return render_template('success.html')
+                return redirect(url_for('success'))
                 
         conn.close();
         return render_template('index.html',
@@ -37,5 +37,7 @@ def index():
     except:
         return "Failed :/"
 
-        
-        
+      
+@app.route('/success', methods=['GET', 'POST'])
+def success():
+    return render_template('success')
