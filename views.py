@@ -6,10 +6,14 @@ import urlparse
 
 app = Flask(__name__)
 
-
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST']):
 def index():
+    return render_template('index.html')
+    
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     urlparse.uses_netloc.append("postgres")
     url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
@@ -31,13 +35,11 @@ def index():
                 return redirect(url_for('success'))
                 
         conn.close();
-        return render_template('index.html',
-                                data=rows,
-                                error=error)
+
     except:
         return "Failed :/"
 
       
 @app.route('/success', methods=['GET', 'POST'])
 def success():
-    return render_template('success')
+    return render_template('success.html')
