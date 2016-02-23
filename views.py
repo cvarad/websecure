@@ -1,8 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, request
 import os
-import psycopg2
+#import psycopg2
 import urlparse
-from app import app
+
+
+app = Flask(__name__)
+
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     urlparse.uses_netloc.append("postgres")
@@ -17,8 +22,8 @@ def index():
             port=url.port
         )
 
-        cur = conn.cursor()
-        cur.execute("""SELECT fname, lname FROM Users WHERE request.form['email'] = email and request.form['password'] = password""")
+        cur = conn.cursor()       
+        cur.execute("""SELECT fname, lname, age FROM Users WHERE email = """ + request.form['email'] + """and password = """ + request.form['password'])
         rows = cur.fetchall()
         for row in rows:
             print row
