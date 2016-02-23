@@ -30,7 +30,7 @@ def index():
             print row
             
         conn.close();
-        return render_template('index.html',
+        return render_template('success.html',
                                 data=rows,
                                 error=error)
     except:
