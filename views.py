@@ -24,14 +24,15 @@ def index():
 
         error=None
         cur = conn.cursor()       
-        cur.execute("""SELECT fname, lname, age FROM Users WHERE email = """ + request.form['email'] + """and password = """ + request.form['password'])
+        cur.execute("""SELECT * FROM Users WHERE email = """ + request.form['email'] + """and password = """ + request.form['password'] + """;""")
         rows = cur.fetchall()
         for row in rows:
             print row
 
         conn.close();
-        return render_template('index.html',
-                                data=rows,
-                                error=error)
+        return redirect(url_for('index'))
+        #return render_template('index.html',
+        #                        data=rows,
+        #                        error=error)
     except:
         return "Failed :/"
