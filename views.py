@@ -19,6 +19,12 @@ def index():
             port=url.port
         )
 
+        cur = conn.cursor()
+        cur.execute("""SELECT * FROM User""")
+        rows = cur.fetchall()
+        for row in rows:
+            print row
+
         return "Connection successful"
     except:
         return "Failed! :("
