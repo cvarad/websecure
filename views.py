@@ -34,7 +34,7 @@ def login():
             if row[2] == request.form['email'] and row[3] == request.form['password']:
                 return redirect(url_for('success'))
         
-        print "Invalid Credentials"
+        return "Invalid Credentials"
         conn.close();
 
     except:
