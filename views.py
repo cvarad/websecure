@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['POST'])
 def index():
     urlparse.uses_netloc.append("postgres")
     url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -24,15 +24,14 @@ def index():
 
         error=None
         cur = conn.cursor()       
-        cur.execute("""SELECT * FROM Users WHERE email = """ + request.form['email'] + """and password = """ + request.form['password'] + """;""")
+        cur.execute("""SELECT * FROM Users;""")
         rows = cur.fetchall()
         for row in rows:
             print row
 
         conn.close();
-        return redirect(url_for('index'))
-        #return render_template('index.html',
-        #                        data=rows,
-        #                        error=error)
+        return render_template('index.html',
+                                data=rows,
+                                error=error)
     except:
         return "Failed :/"
