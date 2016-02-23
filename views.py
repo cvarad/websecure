@@ -6,7 +6,7 @@ import urlparse
 
 app = Flask(__name__)
 
-@app.route('/index', methods=['GET', 'POST']):
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
     
