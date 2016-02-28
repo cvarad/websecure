@@ -29,11 +29,12 @@ def login():
     try:
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
-        cur.execute("""SELECT * FROM Users;""")
+        cur.execute("SELECT * FROM Users WHERE email='" + request.form['email'] + "' AND password='" + request.form['password'] + "'")
+        print cur.description
         rows = cur.fetchall()
-        for row in rows:
-            if row[2] == request.form['email'] and row[3] == request.form['password']:
-                return redirect(url_for('success'))
+        if len(rows) > 0:
+            return render_template('success.html',
+                                    user_data=rows)
 
         return "Invalid Credentials"
         conn.close();
