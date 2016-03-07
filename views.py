@@ -1,4 +1,6 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask.ext.login import LoginManager, login_user, login_required, logout_user
+from models import User
 import os
 import psycopg2
 import urlparse
@@ -18,34 +20,67 @@ except Exception as e:
     pass
 
 app = Flask(__name__)
+app.config.from_object('config')
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(email):
+    return User.get(email, CONN_DETAILS)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    return 'NOTHING HERE'
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    try:
-        conn = psycopg2.connect(**CONN_DETAILS)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM Users WHERE email='" + request.form['email'] + "' AND password='" + request.form['password'] + "'")
-        print cur.description
-        rows = cur.fetchall()
-        if len(rows) > 0:
-            return render_template('success.html',
-                                    user_data=rows)
+    error = None
+    next = request.args.get('next')
+    print next
 
-        return "Invalid Credentials"
-        conn.close();
+    if request.method == 'POST':
+        email, password = request.form['email'], request.form['password']
 
-    except:
-        return "Failed :/"
+        if User.exists(email, password, CONN_DETAILS):
+            user = User.get(email, CONN_DETAILS)
+            login_user(user)
+
+            next = request.form['next']
+            return redirect(next or url_for('catalogue'))
+
+        else:
+            error = "Invalid Credentials"
+
+    return render_template('login.html',
+                            error=error,
+                            next=next)
 
 
-@app.route('/success')
-def success():
-    return render_template('success.html')
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+@app.route('/catalogue')
+@login_required
+def catalogue():
+    conn = psycopg2.connect(**CONN_DETAILS)
+    cur = conn.cursor()
+
+    cur.execute('''SELECT id, title, manufacturer, price FROM Products;''')
+    rows = cur.fetchall()
+    rows = rows[:100]
+
+    return render_template('catalogue.html',
+                            products=rows,
+                            columns=4)
 
 
 if __name__ == '__main__':
