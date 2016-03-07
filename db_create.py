@@ -28,7 +28,7 @@ cur.execute("""CREATE TABLE Passwords (
     email text,
     password text);""")
 
-cur.execute("""INSERT INTO Users (fname, lname, email, password, age) VALUES
+cur.execute("""INSERT INTO Users (fname, lname, email, age) VALUES
     ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 21),
     ('Varad', 'Raut', 'varadraut@gmail.com', 21),
     ('Maitri', 'Vasa', 'maitrivasa15@gmail.com', 21),
