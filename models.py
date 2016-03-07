@@ -21,6 +21,24 @@ class User(UserMixin):
     def get_id(self):
         return self.email
 
+    def update(self, form, CONN_DETAILS):
+        self.fname = form['fname']
+        self.lname = form['lname']
+        self.age = int(form['age'])
+
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+        cur.execute(''' UPDATE Users
+                        SET (fname, lname, age) = (%s, %s, %s)
+                        WHERE email = (%s)''',
+                        (self.fname, self.lname, self.age, self.email))
+        cur.execute(''' UPDATE Passwords
+                        SET password = (%s)
+                        WHERE email = (%s)''',
+                        (form['password'], self.email))
+        conn.commit()
+        conn.close()
+
     @staticmethod
     def get(email, CONN_DETAILS):
         conn = psycopg2.connect(**CONN_DETAILS)

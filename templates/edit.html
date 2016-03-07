@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <form class="form-signin" action="{{ url_for('edit_account') }}" method="POST">
+            {% if message %}
+                <p align="center">{{message}}</p>
+            {% endif %}
+            <h2 class="form-signin-heading" align="center">Edit Details</h2><br>
+            <label for="inputFname" class="sr-only">First Name</label>
+            <input type="text" id="inputFname" class="form-control" placeholder="First Name" name="fname" value="{{current_user.fname}}" required autofocus></input>
+
+            <label for="inputLname" class="sr-only">Last Name</label>
+            <input type="text" id="inputLname" class="form-control" placeholder="Last Name" name="lname" value="{{current_user.lname}}" required>
+
+            <label for="inputAge" class="sr-only">Age</label>
+            <input type="number" id="inputAge" class="form-control" placeholder="Age" name="age" value="{{current_user.age}}" required>
+
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password" required><br>
+
+            <input type="text" name="next" value="{{next}}" hidden="hidden">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
+        </form>
+
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{ error }}
+        {% endif %}
+    </div>
+{% endblock %}

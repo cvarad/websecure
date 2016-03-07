@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
-from flask.ext.login import LoginManager, login_user, login_required, logout_user
+from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User
 import os
 import psycopg2
@@ -32,9 +32,10 @@ def load_user(email):
     return User.get(email, CONN_DETAILS)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+@app.route('/index')
 def index():
-    return 'NOTHING HERE'
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -63,11 +64,22 @@ def login():
                             next=next)
 
 
+@app.route('/edit', methods=['GET', 'POST'])
+def edit_account():
+    message = None
+    if request.method == 'POST':
+        current_user.update(request.form, CONN_DETAILS)
+        message = 'Details updated successfully!'
+
+    return render_template('edit.html',
+                            message=message)
+
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 
 @app.route('/catalogue')
