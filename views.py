@@ -51,6 +51,8 @@ def login():
             login_user(user)
 
             next = request.form['next']
+            if next == 'None':
+                next = None
             return redirect(next or url_for('catalogue'))
 
         else:
