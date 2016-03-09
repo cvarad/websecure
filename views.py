@@ -1,8 +1,11 @@
+#!flask/bin/python
+
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User
 import os
 import psycopg2
+import random
 import urlparse
 
 try:
@@ -90,11 +93,19 @@ def catalogue():
 
     cur.execute('''SELECT id, title, manufacturer, price FROM Products;''')
     rows = cur.fetchall()
-    rows = rows[:100]
+    rows = rows[:20]
+
+    images = list()
+    directory = os.path.join(os.getcwd(), 'static/images/')
+    files = os.listdir(directory)
+    for i in range(len(rows)):
+        images.append('static/images/' + random.choice(files))
 
     return render_template('catalogue.html',
                             products=rows,
-                            columns=4)
+                            images=images,
+                            dim=(140, 170),
+                            columns=3)
 
 
 if __name__ == '__main__':

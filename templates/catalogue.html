@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
+{% if not dim %}
+    {% set dim = (200, 200) %}
+{% endif %}
     <div class="container">
         {% for i in range((products|length)//columns) %}
             <div class="row" style="margin-bottom: 10px;">
                 {% for j in range(columns) %}
-                    <div class="col-lg-{{12//columns}}" style="border: #000 1px solid;">
+                    <div class="col-lg-{{12//columns}} product-holder">
                         {% set item = products[i*columns+j] %}
-                        <a href="details?id={{item[0]}}">{{item[1]}}<a>
+                        <img class="product-image" src="{{images[i*columns+j]}}" width="{{dim[0]}}" height="{{dim[1]}}" alt="Image unavailable" />
+                        <h4><a href="details?id={{item[0]}}">{{item[1]}}<a></h4>
+                        <h5>{{item[2]}}</h5>
+                        <h5>$ {{item[3]}}</h5>
                     </div>
                 {% endfor %}
             </div>
