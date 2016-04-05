@@ -2,7 +2,7 @@
 
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
-from models import User
+from models import User, DB
 import os
 import psycopg2
 import random
@@ -50,7 +50,7 @@ def login():
     if request.method == 'POST':
         email, password = request.form['email'], request.form['password']
 
-        if User.exists(email, password, CONN_DETAILS):
+        if User.exists(CONN_DETAILS, email, password):
             user = User.get(email, CONN_DETAILS)
             login_user(user)
 
@@ -67,7 +67,22 @@ def login():
                             next=next)
 
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    message = None
+    if request.method == 'POST':
+        status = User.create(request.form, CONN_DETAILS)
+        if status:
+            message = """Account created successfully!
+                Please Log in to continue."""
+        else:
+            message = 'User already exists!'
+
+    return render_template('signup.html',
+                            message=message)
+
 @app.route('/edit', methods=['GET', 'POST'])
+@login_required
 def edit_account():
     message = None
     if request.method == 'POST':
@@ -87,13 +102,8 @@ def logout():
 
 @app.route('/catalogue')
 @login_required
-def catalogue():
-    conn = psycopg2.connect(**CONN_DETAILS)
-    cur = conn.cursor()
-
-    cur.execute('''SELECT id, title, manufacturer, price FROM Products;''')
-    rows = cur.fetchall()
-    rows = rows[:20]
+def catalogue(query=None):
+    rows = DB.get_products(CONN_DETAILS, query)[:20]
 
     images = list()
     directory = os.path.join(os.getcwd(), 'static/images/')
@@ -107,6 +117,12 @@ def catalogue():
                             dim=(140, 170),
                             columns=3)
 
+
+@app.route('/search')
+@login_required
+def search():
+    query = request.args.get('query')
+    return catalogue(query)
 
 if __name__ == '__main__':
     CONN_DETAILS = {

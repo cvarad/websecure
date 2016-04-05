@@ -50,12 +50,55 @@ class User(UserMixin):
         return User(*user)
 
     @staticmethod
-    def exists(email, password, CONN_DETAILS):
+    def exists(CONN_DETAILS, email, password=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
-        # Line vulnerable to SQL Injection
-        cur.execute("SELECT * FROM Passwords WHERE email='" + email + "' AND password='" + password + "';")
+        if password is None:
+            cur.execute("SELECT * FROM Users WHERE email='" + email + "';")
+        else:
+            # Line vulnerable to SQL Injection
+            cur.execute("SELECT * FROM Passwords WHERE email='" + email + "' AND password='" + password + "';")
+
         user = cur.fetchone()
         conn.close()
 
         return False if not user else True
+
+    @staticmethod
+    def create(user, CONN_DETAILS):
+        """ Creates a new user if not already present in database """
+        if not User.exists(CONN_DETAILS, user['email']):
+            conn = psycopg2.connect(**CONN_DETAILS)
+            cur = conn.cursor()
+            cur.execute("""INSERT INTO Users (fname, lname, email, age) VALUES
+                (%s, %s, %s, %s)""", (user['fname'], user['lname'], user['email'], user['age']))
+            cur.execute("""INSERT INTO Passwords VALUES
+                (%s, %s)""", (user['email'], user['password']))
+            conn.commit()
+            conn.close()
+
+            return True
+
+        return False
+
+
+class DB():
+    """docstring for DB"""
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_products(CONN_DETAILS, query=None):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+
+        if query is None:
+            cur.execute('''SELECT id, title, manufacturer, price FROM Products;''')
+        else:
+            cur.execute(""" SELECT id, title, manufacturer, price
+                            FROM products
+                            WHERE title LIKE '%""" +query+ """%'""")
+
+        rows = cur.fetchall()
+        conn.close()
+        return rows
