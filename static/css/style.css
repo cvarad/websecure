@@ -16,7 +16,7 @@ h5 {
     min-width: 100px;
 }
 
-.form-signin .form-search {
+.form-signin, .form-search {
   max-width: 330px;
   padding: 15px;
   margin: 0 auto;

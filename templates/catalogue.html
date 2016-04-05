@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
     <form class="form-search" action="{{ url_for('search') }}" method="GET">
-        <h2 align="center">Log In</h2><br>
         <label for="inputQuery" class="sr-only">Query</label>
         <input type="text" id="inputQuery" class="form-control" placeholder="Enter Search Term" name="query" required autofocus>
     </form>
+    {% if query %}
+        <p align="center">Results for: {{query}}</p>
+    {% endif %}
 
     {% if not dim %}
         {% set dim = (200, 200) %}

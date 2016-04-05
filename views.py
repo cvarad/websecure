@@ -112,6 +112,7 @@ def catalogue(query=None):
         images.append('static/images/' + random.choice(files))
 
     return render_template('catalogue.html',
+                            query=query,
                             products=rows,
                             images=images,
                             dim=(140, 170),
