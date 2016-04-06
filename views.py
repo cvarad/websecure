@@ -100,6 +100,13 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/delete')
+@login_required
+def delete():
+    current_user.delete(CONN_DETAILS)
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.route('/catalogue')
 @login_required
 def catalogue(query=None):

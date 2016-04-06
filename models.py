@@ -39,6 +39,15 @@ class User(UserMixin):
         conn.commit()
         conn.close()
 
+    def delete(self, CONN_DETAILS):
+        """ Deletes all details about the user from the DB """
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+        cur.execute("""DELETE FROM Users WHERE email=(%s)""", (self.email,))
+        cur.execute("""DELETE FROM Passwords WHERE email=(%s)""", (self.email,))
+        conn.commit()
+        conn.close()
+
     @staticmethod
     def get(email, CONN_DETAILS):
         conn = psycopg2.connect(**CONN_DETAILS)

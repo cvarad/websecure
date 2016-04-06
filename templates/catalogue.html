@@ -5,7 +5,9 @@
         <input type="text" id="inputQuery" class="form-control" placeholder="Enter Search Term" name="query" required autofocus>
     </form>
     {% if query %}
-        <p align="center">Results for: {{query}}</p>
+        {% autoescape false %}
+            <p align="center">Results for: {{query}}</p>
+        {% endautoescape %}
     {% endif %}
 
     {% if not dim %}
