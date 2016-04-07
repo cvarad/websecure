@@ -1,5 +1,6 @@
 #!flask/bin/python
 
+import flask
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User, DB
@@ -104,8 +105,8 @@ def logout():
 @login_required
 def delete():
     current_user.delete(CONN_DETAILS)
-    logout_user()
-    return redirect(url_for('index'))
+    return logout()
+
 
 @app.route('/catalogue')
 @login_required
@@ -126,11 +127,24 @@ def catalogue(query=None):
                             columns=3)
 
 
+@app.route('/details')
+@login_required
+def details():
+    pass
+
+
 @app.route('/search')
 @login_required
 def search():
     query = request.args.get('query')
     return catalogue(query)
+
+
+@app.route('/file')
+def serve_file(file_name=None):
+    file_name = request.args.get('name')
+    return flask.send_file(file_name)
+
 
 if __name__ == '__main__':
     CONN_DETAILS = {
