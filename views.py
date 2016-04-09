@@ -4,12 +4,24 @@ import flask
 from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User, DB
-from conn_details import CONN_DETAILS
+#from conn_details import CONN_DETAILS
 import os
 import psycopg2
 import random
 import urlparse
 
+try:
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(os.environ["DATABASE_URL"])
+    CONN_DETAILS = {
+        'database': url.path[1:],
+        'user': url.username,
+        'password': url.password,
+        'host': url.hostname,
+        'port': url.port
+    }
+except Exception as e:
+    pass
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -21,7 +33,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(email):
-    return User.get(email)
+    return User.get(email, CONN_DETAILS)
 
 
 @app.route('/')
@@ -34,13 +46,12 @@ def index():
 def login():
     error = None
     next = request.args.get('next')
-    print next
 
     if request.method == 'POST':
         email, password = request.form['email'], request.form['password']
 
-        if User.exists(email, password):
-            user = User.get(email)
+        if User.exists(CONN_DETAILS, email, password):
+            user = User.get(email, CONN_DETAILS)
             login_user(user)
 
             next = request.form['next']
@@ -99,7 +110,7 @@ def delete():
 @app.route('/catalogue')
 @login_required
 def catalogue(query=None):
-    rows = DB.get_products(query)[:20]
+    rows = DB.get_products(CONN_DETAILS, query)[:20]
 
     images = list()
     directory = os.path.join(os.getcwd(), 'static/images/')
@@ -163,4 +174,12 @@ def serve_file(file_name=None):
 
 
 if __name__ == '__main__':
+    CONN_DETAILS = {
+        'database': 'mydb',
+        'user': 'postgres',
+        'password': 'varad',
+        'host': '127.0.0.1',
+        'port': '5432'
+    }
+
     app.run(debug=True)

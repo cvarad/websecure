@@ -1,5 +1,5 @@
 from flask.ext.login import UserMixin
-from conn_details import CONN_DETAILS
+#from conn_details import CONN_DETAILS
 import psycopg2
 
 class User(UserMixin):
@@ -67,7 +67,7 @@ class User(UserMixin):
         return rows
 
     @staticmethod
-    def get(email):
+    def get(email, CONN_DETAILS):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         cur.execute("SELECT fname, lname, email, age, admin FROM Users WHERE email='" + email + "';")
@@ -77,7 +77,7 @@ class User(UserMixin):
         return User(*user)
 
     @staticmethod
-    def exists(email, password=None):
+    def exists(CONN_DETAILS, email, password=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         if password is None:
@@ -115,7 +115,7 @@ class DB():
         pass
 
     @staticmethod
-    def get_products(query=None):
+    def get_products(CONN_DETAILS, query=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
 
