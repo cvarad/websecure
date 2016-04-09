@@ -2,6 +2,9 @@
 {% block content %}
 <!-- Main jumbotron -->
 <div class="container">
+    {% if current_user.is_authenticated and current_user.admin %}
+        Congrats! You're an Admin
+    {% endif %}
     <div class="jumbotron">
         <h1>Hello, consumer!</h1>
         <h2>Welcome to <strong>Websecure</strong></h2>

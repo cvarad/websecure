@@ -1,12 +1,14 @@
 from flask.ext.login import UserMixin
+from conn_details import CONN_DETAILS
 import psycopg2
 
 class User(UserMixin):
-    def __init__(self, fname, lname, email, age, active=True):
+    def __init__(self, fname, lname, email, age, admin, active=True):
         self.fname = fname
         self.lname = lname
         self.email = email
         self.age = age
+        self.admin = admin
         self.active = active
 
     def is_active(self):
@@ -21,7 +23,7 @@ class User(UserMixin):
     def get_id(self):
         return self.email
 
-    def update(self, form, CONN_DETAILS):
+    def update(self, form):
         self.fname = form['fname']
         self.lname = form['lname']
         self.age = int(form['age'])
@@ -39,7 +41,7 @@ class User(UserMixin):
         conn.commit()
         conn.close()
 
-    def delete(self, CONN_DETAILS):
+    def delete(self):
         """ Deletes all details about the user from the DB """
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
@@ -48,18 +50,34 @@ class User(UserMixin):
         conn.commit()
         conn.close()
 
-    @staticmethod
-    def get(email, CONN_DETAILS):
+    def on_purchase(self, product_id):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
-        cur.execute("SELECT fname, lname, email, age FROM Users WHERE email='" + email + "';")
+        cur.execute("""INSERT INTO Purchases VALUES
+            (%s, %s)""", (self.email, product_id))
+        conn.commit()
+        conn.close()
+
+    def get_purchases(self):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+        cur.execute('''SELECT product_id FROM Purchases WHERE email=(%s)''', (self.email,))
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+
+    @staticmethod
+    def get(email):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+        cur.execute("SELECT fname, lname, email, age, admin FROM Users WHERE email='" + email + "';")
         user = cur.fetchone()
         conn.close()
 
         return User(*user)
 
     @staticmethod
-    def exists(CONN_DETAILS, email, password=None):
+    def exists(email, password=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         if password is None:
@@ -74,13 +92,13 @@ class User(UserMixin):
         return False if not user else True
 
     @staticmethod
-    def create(user, CONN_DETAILS):
+    def create(user):
         """ Creates a new user if not already present in database """
-        if not User.exists(CONN_DETAILS, user['email']):
+        if not User.exists(user['email']):
             conn = psycopg2.connect(**CONN_DETAILS)
             cur = conn.cursor()
-            cur.execute("""INSERT INTO Users (fname, lname, email, age) VALUES
-                (%s, %s, %s, %s)""", (user['fname'], user['lname'], user['email'], user['age']))
+            cur.execute("""INSERT INTO Users (fname, lname, email, age, admin) VALUES
+                (%s, %s, %s, %s, %s)""", (user['fname'], user['lname'], user['email'], user['age'], 'f'))
             cur.execute("""INSERT INTO Passwords VALUES
                 (%s, %s)""", (user['email'], user['password']))
             conn.commit()
@@ -97,7 +115,7 @@ class DB():
         pass
 
     @staticmethod
-    def get_products(CONN_DETAILS, query=None):
+    def get_products(query=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
 
@@ -107,6 +125,36 @@ class DB():
             cur.execute(""" SELECT id, title, manufacturer, price
                             FROM products
                             WHERE title LIKE '%""" +query+ """%'""")
+
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+
+    @staticmethod
+    def get_product(id):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+
+        cur.execute(''' SELECT *
+                        FROM products
+                        WHERE id=(%s)''',
+                        (id,))
+
+        row = cur.fetchone()
+        conn.close()
+        return row
+
+    @staticmethod
+    def get_purchases(email):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+
+        cur.execute(''' SELECT title, price
+                        FROM Users, Products, Purchases
+                        WHERE Users.email=(%s)
+                            AND Purchases.email=Users.email
+                            AND Products.id=product_id''',
+                        (email,))
 
         rows = cur.fetchall()
         conn.close()

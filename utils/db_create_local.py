@@ -11,25 +11,31 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
+cur.execute("""DROP TABLE IF EXISTS Passwords;""")
 cur.execute("""DROP TABLE IF EXISTS Users;""")
 
 cur.execute("""CREATE TABLE Users (
     id serial,
     fname text,
     lname text,
-    email text,
-    age integer);""")
+    email text primary key,
+    age integer,
+    admin boolean);""")
 
 cur.execute("""CREATE TABLE Passwords (
-    email text,
+    email text references Users(email),
     password text);""")
 
-cur.execute("""INSERT INTO Users (fname, lname, email, age) VALUES
-    ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 21),
-    ('Varad', 'Raut', 'varadraut@gmail.com', 21),
-    ('Maitri', 'Vasa', 'maitrivasa15@gmail.com', 21),
-    ('Abigail', 'Fernandes', 'abigailferns94@gmail.com', 21),
-    ('Sushmita', 'Muthe', 'sush.muthe594@gmail.com', 21);""")
+cur.execute("""CREATE TABLE Purchases (
+    email text references Users(email),
+    product_id text references Products(id));""")
+
+cur.execute("""INSERT INTO Users (fname, lname, email, age, admin) VALUES
+    ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 21, 'true'),
+    ('Varad', 'Raut', 'varadraut@gmail.com', 21, 'true'),
+    ('Maitri', 'Vasa', 'maitrivasa15@gmail.com', 21, 'true'),
+    ('Abigail', 'Fernandes', 'abigailferns94@gmail.com', 21, 'false'),
+    ('Sushmita', 'Muthe', 'sush.muthe594@gmail.com', 21, 'false');""")
 
 cur.execute("""INSERT INTO Passwords VALUES
     ('varaddeolankar@gmail.com', 'varadrocks'),

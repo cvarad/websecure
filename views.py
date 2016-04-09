@@ -1,27 +1,15 @@
 #!flask/bin/python
 
 import flask
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User, DB
+from conn_details import CONN_DETAILS
 import os
 import psycopg2
 import random
 import urlparse
 
-try:
-    urlparse.uses_netloc.append("postgres")
-    url = urlparse.urlparse(os.environ["DATABASE_URL"])
-    CONN_DETAILS = {
-        'database': url.path[1:],
-        'user': url.username,
-        'password': url.password,
-        'host': url.hostname,
-        'port': url.port
-    }
-
-except Exception as e:
-    pass
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -33,7 +21,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(email):
-    return User.get(email, CONN_DETAILS)
+    return User.get(email)
 
 
 @app.route('/')
@@ -51,8 +39,8 @@ def login():
     if request.method == 'POST':
         email, password = request.form['email'], request.form['password']
 
-        if User.exists(CONN_DETAILS, email, password):
-            user = User.get(email, CONN_DETAILS)
+        if User.exists(email, password):
+            user = User.get(email)
             login_user(user)
 
             next = request.form['next']
@@ -72,7 +60,7 @@ def login():
 def signup():
     message = None
     if request.method == 'POST':
-        status = User.create(request.form, CONN_DETAILS)
+        status = User.create(request.form)
         if status:
             message = """Account created successfully!
                 Please Log in to continue."""
@@ -87,7 +75,7 @@ def signup():
 def edit_account():
     message = None
     if request.method == 'POST':
-        current_user.update(request.form, CONN_DETAILS)
+        current_user.update(request.form)
         message = 'Details updated successfully!'
 
     return render_template('edit.html',
@@ -104,14 +92,14 @@ def logout():
 @app.route('/delete')
 @login_required
 def delete():
-    current_user.delete(CONN_DETAILS)
+    current_user.delete()
     return logout()
 
 
 @app.route('/catalogue')
 @login_required
 def catalogue(query=None):
-    rows = DB.get_products(CONN_DETAILS, query)[:20]
+    rows = DB.get_products(query)[:20]
 
     images = list()
     directory = os.path.join(os.getcwd(), 'static/images/')
@@ -119,25 +107,53 @@ def catalogue(query=None):
     for i in range(len(rows)):
         images.append('static/images/' + random.choice(files))
 
-    return render_template('catalogue.html',
+    r = make_response(
+            render_template('catalogue.html',
                             query=query,
                             products=rows,
                             images=images,
                             dim=(140, 170),
                             columns=3)
+        )
+
+    r.headers.set('X-XSS-Protection', '0')
+    return r
 
 
 @app.route('/details')
 @login_required
-def details():
-    pass
+def details(product_id=None, msg=None):
+    product_id = product_id or request.args.get('id')
+    if not product_id:
+        return redirect(url_for('catalogue'))
 
+    row = DB.get_product(product_id)
+    return render_template('details.html',
+                            message=msg,
+                            product=row)
+
+
+@app.route('/buy')
+def buy():
+    product_id = request.args.get('id')
+    current_user.on_purchase(product_id)
+    msg = 'Congrats! Purchase Successful'
+    return details(product_id, msg)
+
+
+@app.route('/purchases', methods=['POST'])
+def purchases():
+    email = request.form['email']
+    rows = DB.get_purchases(email)
+    print rows
+    return render_template('purchases.html',
+                            products=rows)
 
 @app.route('/search')
 @login_required
 def search():
     query = request.args.get('query')
-    return catalogue(query)
+    return catalogue(query=query)
 
 
 @app.route('/file')
@@ -147,12 +163,4 @@ def serve_file(file_name=None):
 
 
 if __name__ == '__main__':
-    CONN_DETAILS = {
-        'database': 'mydb',
-        'user': 'postgres',
-        'password': 'varad',
-        'host': '127.0.0.1',
-        'port': '5432'
-    }
-
     app.run(debug=True)

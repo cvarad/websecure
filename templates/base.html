@@ -35,6 +35,11 @@
                             <ul class="dropdown-menu">
                                 <li align="right"><a href="{{url_for('logout')}}">Log Out</a></li>
                                 <li align="right"><a href="{{url_for('edit_account')}}">Edit Account</a></li>
+                                <form id="purchase-form" action="{{url_for('purchases')}}" method="post" hidden>
+                                    <input type="text" name="email" value="{{current_user.email}}" hidden/>
+                                    <input  type="submit" value="My Purchases">
+                                </form>
+                                <li align="right"><a href="javascript: void(0)" id="purchase-btn">My Purchases</a></li>
                             </ul>
                         </li>
 
@@ -51,5 +56,10 @@
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="static/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+            document.getElementById("purchase-btn").onclick = function() {
+                document.getElementById("purchase-form").submit();
+            }
+        </script>
     </body>
 </html>
