@@ -1,2 +1,3 @@
 SECRET_KEY = 'something secure'
 USE_X_SENDFILE = False
+SESSION_COOKIE_HTTPONLY = False

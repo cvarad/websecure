@@ -2,7 +2,12 @@
 {% block content %}
     <div class="container">
         <br>
-        <h3 align="center">Purchases</h3><br>
+        <h3 align="center">Purchases</h3>
+        <form id="purchases-dl-form" action="/file" method="post">
+            <input type="text" name="name" value="{{current_user.id}}.csv" hidden/>
+            <h5 align="center"><a href="javascript: void(0)" id="download-btn">Download</a></h5>
+        </form>
+        <br>
         <table class="table table-hover">
             <tr>
                 <th>Title</th>
@@ -16,4 +21,10 @@
             {% endfor %}
         </table>
     </div>
+
+    <script type="text/javascript">
+        document.getElementById("download-btn").onclick = function() {
+            document.getElementById("purchases-dl-form").submit();
+        }
+    </script>
 {% endblock %}

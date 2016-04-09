@@ -56,6 +56,7 @@ def login():
         if User.exists(email, password):
             user = User.get(email)
             login_user(user)
+            create_purchases_text(current_user.email, current_user.id)
 
             next = request.form['next']
             if next == 'None':
@@ -170,10 +171,19 @@ def search():
     return catalogue(query=query)
 
 
-@app.route('/file')
-def serve_file(file_name=None):
-    file_name = request.args.get('name')
-    return flask.send_file(file_name)
+@app.route('/file', methods=['POST'])
+def serve_file():
+    file_name = request.form['name']
+    return flask.send_file( 'purchase_records/'+file_name,
+                            as_attachment=True,
+                            attachment_filename=file_name)
+
+
+def create_purchases_text(user_email, user_id):
+    rows = DB.get_purchases(user_email)
+    with open('purchase_records/'+str(user_id)+'.csv', 'w') as f:
+        for row in rows:
+            f.write('{}, {}\n'.format(row[0], row[1]))
 
 
 if __name__ == '__main__':

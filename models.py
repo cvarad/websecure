@@ -7,7 +7,8 @@ def set_conn_details(details):
     CONN_DETAILS = details
 
 class User(UserMixin):
-    def __init__(self, fname, lname, email, age, admin, active=True):
+    def __init__(self, id, fname, lname, email, age, admin, active=True):
+        self.id = id
         self.fname = fname
         self.lname = lname
         self.email = email
@@ -74,7 +75,7 @@ class User(UserMixin):
     def get(email):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
-        cur.execute("SELECT fname, lname, email, age, admin FROM Users WHERE email='" + email + "';")
+        cur.execute("SELECT id, fname, lname, email, age, admin FROM Users WHERE email='" + email + "';")
         user = cur.fetchone()
         conn.close()
 
