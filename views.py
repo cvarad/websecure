@@ -4,7 +4,6 @@ import flask
 from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User, DB
-#from conn_details import CONN_DETAILS
 import os
 import psycopg2
 import random
@@ -20,6 +19,10 @@ try:
         'host': url.hostname,
         'port': url.port
     }
+
+    import models
+    models.set_conn_details(CONN_DETAILS)
+
 except Exception as e:
     pass
 
@@ -33,7 +36,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(email):
-    return User.get(email, CONN_DETAILS)
+    return User.get(email)
 
 
 @app.route('/')
@@ -50,8 +53,8 @@ def login():
     if request.method == 'POST':
         email, password = request.form['email'], request.form['password']
 
-        if User.exists(CONN_DETAILS, email, password):
-            user = User.get(email, CONN_DETAILS)
+        if User.exists(email, password):
+            user = User.get(email)
             login_user(user)
 
             next = request.form['next']
@@ -110,7 +113,7 @@ def delete():
 @app.route('/catalogue')
 @login_required
 def catalogue(query=None):
-    rows = DB.get_products(CONN_DETAILS, query)[:20]
+    rows = DB.get_products(query)[:20]
 
     images = list()
     directory = os.path.join(os.getcwd(), 'static/images/')
@@ -182,4 +185,6 @@ if __name__ == '__main__':
         'port': '5432'
     }
 
+    import models
+    models.set_conn_details(CONN_DETAILS)
     app.run(debug=True)

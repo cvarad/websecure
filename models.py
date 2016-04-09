@@ -1,6 +1,10 @@
 from flask.ext.login import UserMixin
-#from conn_details import CONN_DETAILS
 import psycopg2
+
+CONN_DETAILS = dict()
+def set_conn_details(details):
+    global CONN_DETAILS
+    CONN_DETAILS = details
 
 class User(UserMixin):
     def __init__(self, fname, lname, email, age, admin, active=True):
@@ -67,7 +71,7 @@ class User(UserMixin):
         return rows
 
     @staticmethod
-    def get(email, CONN_DETAILS):
+    def get(email):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         cur.execute("SELECT fname, lname, email, age, admin FROM Users WHERE email='" + email + "';")
@@ -77,7 +81,7 @@ class User(UserMixin):
         return User(*user)
 
     @staticmethod
-    def exists(CONN_DETAILS, email, password=None):
+    def exists(email, password=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         if password is None:
@@ -115,7 +119,7 @@ class DB():
         pass
 
     @staticmethod
-    def get_products(CONN_DETAILS, query=None):
+    def get_products(query=None):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
 
