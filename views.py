@@ -68,7 +68,8 @@ def login():
 
     return render_template('login.html',
                             error=error,
-                            next=next)
+                            next=next,
+                            addr=request.remote_addr)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -197,4 +198,4 @@ if __name__ == '__main__':
 
     import models
     models.set_conn_details(CONN_DETAILS)
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
