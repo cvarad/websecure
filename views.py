@@ -180,6 +180,13 @@ def serve_file():
                             attachment_filename=file_name)
 
 
+@app.route('/iprecv', methods=['POST'])
+def iprecv():
+    ip_addr = request.form['addr']
+    print ip_addr
+    return "Success"
+
+
 def create_purchases_text(user_email, user_id):
     rows = DB.get_purchases(user_email)
     with open('purchase_records/'+str(user_id)+'.csv', 'w') as f:

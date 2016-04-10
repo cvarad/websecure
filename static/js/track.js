@@ -82,4 +82,8 @@ getIPs(function(ip){
     var textnode = document.createTextNode(ip);
     node.appendChild(textnode);
     document.getElementById('ip-display').appendChild(node);
+
+    $.post('/iprecv', {addr: ip}, function(result) {
+        console.log(result);
+    });
 });
