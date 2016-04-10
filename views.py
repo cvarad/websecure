@@ -42,6 +42,8 @@ def load_user(email):
 @app.route('/')
 @app.route('/index')
 def index():
+    print 'X-Forwarded-For', request.headers.get('X-Forwarded-For')
+    print 'X-Client-IP', request.headers.get('X-Client-IP')
     return render_template('index.html')
 
 
