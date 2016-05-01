@@ -39,7 +39,7 @@
                                     <input type="text" name="email" value="{{current_user.email}}" hidden/>
                                     <input  type="submit" value="My Purchases">
                                 </form>
-                                <li align="right"><a href="javascript: void(0)" id="purchase-btn">My Purchases</a></li>
+                                <li align="right"><a href="javascript:void(0)" id="purchase_btn">My Purchases</a></li>
                             </ul>
                         </li>
 
@@ -55,8 +55,15 @@
         <div id="ip-display"></div>
         {% block content %}{% endblock %}
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="static/js/jquery.min.js"></script>
         <script src="static/js/bootstrap.min.js"></script>
         <script src="static/js/track.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(document).on('click', '#purchase_btn', function() {
+                    $('#purchase-form').submit();
+                });
+            });
+        </script>
     </body>
 </html>
