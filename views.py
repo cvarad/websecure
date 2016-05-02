@@ -3,6 +3,7 @@
 import flask
 from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.contrib.fixers import ProxyFix
 from models import User, DB
 import os
 import psycopg2
@@ -194,12 +195,15 @@ def iprecv():
 def address():
     return "Your IP Address is: %s\n" % str(request.remote_addr)
 
+
 def create_purchases_text(user_email, user_id):
     rows = DB.get_purchases(user_email)
     with open('purchase_records/'+str(user_id)+'.csv', 'w') as f:
         for row in rows:
             f.write('{}, {}\n'.format(row[0], row[1]))
 
+
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == '__main__':
     CONN_DETAILS = {
