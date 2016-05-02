@@ -42,6 +42,7 @@ def load_user(email):
 @app.route('/')
 @app.route('/index')
 def index():
+    print 'Remote Addr', request.remote_addr
     print 'X-Forwarded-For', request.headers.get('X-Forwarded-For')
     print 'X-Client-IP', request.headers.get('X-Client-IP')
     return render_template('index.html')
@@ -188,6 +189,10 @@ def iprecv():
     print ip_addr
     return "Success"
 
+
+@app.route('/address')
+def address():
+    return "Your IP Address is: %s\n" % str(request.remote_addr)
 
 def create_purchases_text(user_email, user_id):
     rows = DB.get_purchases(user_email)
