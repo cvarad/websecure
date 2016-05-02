@@ -187,7 +187,7 @@ def serve_file():
 @app.route('/iprecv', methods=['POST'])
 def iprecv():
     ip_addr = request.form['addr']
-    print ip_addr
+    print "Client's Internal/External IP:", ip_addr
     return "Success"
 
 
