@@ -15,8 +15,10 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-cur.execute("""DROP TABLE IF EXISTS Users;""")
+cur.execute("""DROP TABLE IF EXISTS Purchases;""")
+cur.execute("""DROP TABLE IF EXISTS Comments;""")
 cur.execute("""DROP TABLE IF EXISTS Passwords;""")
+cur.execute("""DROP TABLE IF EXISTS Users;""")
 
 cur.execute("""CREATE TABLE Users (
     id serial,
@@ -33,6 +35,12 @@ cur.execute("""CREATE TABLE Passwords (
 cur.execute("""CREATE TABLE Purchases (
     email text references Users(email),
     product_id text references Products(id));""")
+
+cur.execute("""CREATE TABLE Comments (
+    email text references Users(email),
+    product_id text references Products(id),
+    comment text,
+    timestamp text);""")
 
 cur.execute("""INSERT INTO Users (fname, lname, email, age, admin) VALUES
     ('Varad', 'Deolankar', 'varaddeolankar@gmail.com', 21, 'true'),

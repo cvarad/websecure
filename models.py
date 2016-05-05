@@ -164,3 +164,29 @@ class DB():
         rows = cur.fetchall()
         conn.close()
         return rows
+
+    @staticmethod
+    def add_comment(email, product_id, comment):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+
+        cur.execute(''' INSERT INTO Comments VALUES
+            (%s, %s, %s, CURRENT_TIMESTAMP)''', (email, product_id, comment))
+
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def get_comments(product_id):
+        conn = psycopg2.connect(**CONN_DETAILS)
+        cur = conn.cursor()
+
+        cur.execute(''' SELECT fname, lname, comment, timestamp
+                        FROM Users, Comments
+                        WHERE Comments.product_id=(%s)
+                            AND Users.email=Comments.email''',
+                        (product_id,))
+
+        rows = cur.fetchall()
+        conn.close()
+        return rows

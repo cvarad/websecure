@@ -6,7 +6,7 @@
         {% endif %}
 
         <h3>{{ product[1] }}</h3>
-        <h4 class="subtext">{{ product[3] }}</h4>
+        <span class="subtext">by</span> <span class="h4 text-primary">{{ product[3] }}</span>
 
         <br><br>
         <h4 align="center">Price: ${{ product[4] }}</h4>
@@ -21,5 +21,27 @@
         <p style="margin-left: 4%; width: 90%">
             {{ product[2] }}
         </p>
+
+        <br><hr style="border: 1px solid #999"><br>
+        <h4>Comments:</h4>
+        <div class="comments">
+            {% autoescape false %}
+            {% for comment in comments %}
+                <div class="comment">
+                    <span class="h5 text-primary">{{comment['name']}}</span>
+                    <span class="text-muted small">on {{comment['date']}} at {{comment['time']}}</span><br>
+                    {{ comment['text'] }}
+                </div>
+            {% endfor %}
+            {% endautoescape %}
+        </div>
+        <div class="add-comment">
+            <form action="/comment" method="post">
+                <input type="text" name="product_id" value="{{product[0]}}" hidden/>
+                <textarea class="form-control" rows="4" id="comment" name="comment" placeholder="Add a comment..."></textarea>
+                <button type="submit" class="btn btn-default pull-right" style="margin-top: 5px;">Post Comment</button>
+            </form>
+        </div>
+        <div class="solid-blocker"></div>
     </div>
 {% endblock %}

@@ -147,11 +147,26 @@ def details(product_id=None, msg=None):
     if not product_id:
         return redirect(url_for('catalogue'))
 
-    row = DB.get_product(product_id)
-    return render_template('details.html',
-                            message=msg,
-                            product=row)
+    product = DB.get_product(product_id)
+    rows = DB.get_comments(product_id)
+    comments = list()
+    for row in rows:
+        comment = dict()
+        comment['name'] = ' '.join(row[:2])
+        comment['text'] = row[2]
+        comment['date'], comment['time'] = row[3].split()
+        comment['time'] = comment['time'].split('.')[0]
+        comments.append(comment)
 
+    r = make_response(
+            render_template('details.html',
+                            message=msg,
+                            product=product,
+                            comments=comments)
+        )
+
+    r.headers.set('X-XSS-Protection', '0')
+    return r
 
 @app.route('/buy')
 def buy():
@@ -168,6 +183,16 @@ def purchases():
     print rows
     return render_template('purchases.html',
                             products=rows)
+
+
+@app.route('/comment', methods=['POST'])
+def comment():
+    email = current_user.email
+    product_id = request.form['product_id']
+    comment = request.form['comment']
+    DB.add_comment(email, product_id, comment)
+    return redirect(url_for('details', id=product_id))
+
 
 @app.route('/search')
 @login_required

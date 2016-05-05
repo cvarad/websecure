@@ -7,6 +7,10 @@
     text-align: center;
 }
 
+.h5 {
+    font-size: 15px;
+}
+
 .dropdown-menu {
     min-width: 100px;
 }
@@ -62,4 +66,13 @@
 .subtext {
     color: #5d5d5d;
     margin-bottom: -5px;
+}
+
+.comment {
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.add-comment {
+    padding: 15px;
 }
