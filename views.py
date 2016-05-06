@@ -1,7 +1,7 @@
 #!flask/bin/python
 
 import flask
-from flask import Flask, render_template, redirect, url_for, request, flash, make_response
+from flask import Flask, render_template, redirect, url_for, request, flash, make_response, session
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.contrib.fixers import ProxyFix
 from models import User, DB
@@ -58,6 +58,8 @@ def login():
         email, password = request.form['email'], request.form['password']
 
         if User.exists(email, password):
+            session['cart'] = list()    # Add 'cart' to the current user session.
+
             user = User.get(email)
             login_user(user)
             create_purchases_text(current_user.email, current_user.id)
@@ -168,6 +170,7 @@ def details(product_id=None, msg=None):
     r.headers.set('X-XSS-Protection', '0')
     return r
 
+
 @app.route('/buy')
 def buy():
     product_id = request.args.get('id')
@@ -180,9 +183,32 @@ def buy():
 def purchases():
     email = request.form['email']
     rows = DB.get_purchases(email)
-    print rows
     return render_template('purchases.html',
                             products=rows)
+
+
+@app.route('/cart', methods=['GET', 'POST'])
+def cart():
+    msg = None
+
+    if request.method == 'POST':
+        mode = request.form['mode']
+        if mode == 'clear':
+            session['cart'] = list()
+        elif mode == 'checkout':
+            current_user.on_purchase(session['cart'])
+            session['cart'] = list()
+            msg = 'Items successfully purchased!'
+        elif mode == 'add':
+            product_id = request.form['product_id']
+            session['cart'].append(product_id)
+
+    current_user.set_cart(session['cart'])
+    total = sum([product['price'] for product in current_user.cart])
+    return render_template('cart.html',
+                            cart=current_user.cart,
+                            total=total,
+                            msg=msg)
 
 
 @app.route('/comment', methods=['POST'])
@@ -241,4 +267,4 @@ if __name__ == '__main__':
 
     import models
     models.set_conn_details(CONN_DETAILS)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', threaded=True)

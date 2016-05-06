@@ -1,5 +1,5 @@
 from flask.ext.login import UserMixin
-import psycopg2
+import psycopg2, psycopg2.extras
 
 CONN_DETAILS = dict()
 def set_conn_details(details):
@@ -15,6 +15,7 @@ class User(UserMixin):
         self.age = age
         self.admin = admin
         self.active = active
+        self.cart = list()
 
     def is_active(self):
         return self.active
@@ -55,11 +56,12 @@ class User(UserMixin):
         conn.commit()
         conn.close()
 
-    def on_purchase(self, product_id):
+    def on_purchase(self, product_id_list):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
-        cur.execute("""INSERT INTO Purchases VALUES
-            (%s, %s)""", (self.email, product_id))
+        for _id in product_id_list:
+            cur.execute("""INSERT INTO Purchases VALUES
+                (%s, %s)""", (self.email, _id))
         conn.commit()
         conn.close()
 
@@ -70,6 +72,13 @@ class User(UserMixin):
         rows = cur.fetchall()
         conn.close()
         return rows
+
+    def set_cart(self, products):
+        for _id in products:
+            row = DB.get_product(_id)
+            product = {k:row[k] for k in ['id', 'title', 'price']}
+            self.cart.append(product)
+
 
     @staticmethod
     def get(email):
@@ -138,7 +147,7 @@ class DB():
     @staticmethod
     def get_product(id):
         conn = psycopg2.connect(**CONN_DETAILS)
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cur.execute(''' SELECT *
                         FROM products

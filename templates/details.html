@@ -10,9 +10,10 @@
 
         <br><br>
         <h4 align="center">Price: ${{ product[4] }}</h4>
-        <form action="/buy" method="GET">
-            <input type="text" name="id" value="{{ product[0] }}" hidden/>
-            <button type="submit" class="btn btn-primary center-block" style="width: 10%;">BUY</button>
+        <form action="/cart" method="POST">
+            <input type="text" name="mode" value="add" hidden/>
+            <input type="text" name="product_id" value="{{ product[0] }}" hidden/>
+            <button type="submit" class="btn btn-primary center-block" style="width: 10%;">Add to Cart</button>
         </form>
 
         <br><br>
