@@ -33,6 +33,7 @@ class User(UserMixin):
         self.fname = form['fname']
         self.lname = form['lname']
         self.age = int(form['age'])
+        password = form['password']
 
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
@@ -40,10 +41,12 @@ class User(UserMixin):
                         SET (fname, lname, age) = (%s, %s, %s)
                         WHERE email = (%s)''',
                         (self.fname, self.lname, self.age, self.email))
-        cur.execute(''' UPDATE Passwords
-                        SET password = (%s)
-                        WHERE email = (%s)''',
-                        (form['password'], self.email))
+#        cur.execute(''' UPDATE Passwords
+#                        SET password = (%s)
+#                        WHERE email = (%s)''',
+#                        (form['password'], self.email))
+
+        cur.execute("UPDATE Passwords SET password='" + password + "' WHERE email='" + self.email + "'")
         conn.commit()
         conn.close()
 
