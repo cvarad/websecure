@@ -239,6 +239,13 @@ def search():
 @app.route('/file', methods=['POST'])
 def serve_file():
     file_name = request.form['name']
+
+    check_file = file_name.split('/')[-1]
+    if not os.path.isfile('purchase_records/'+check_file):
+        print 'Potential Insecure Direct Object Reference Attack'
+
+    if current_user.is_authenticated:
+        create_purchases_text(current_user.email, current_user.id)
     return flask.send_file( 'purchase_records/'+file_name,
                             as_attachment=True,
                             attachment_filename=file_name)
