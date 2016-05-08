@@ -9,6 +9,7 @@ import os
 import psycopg2
 import random
 import urlparse
+import re
 
 try:
     urlparse.uses_netloc.append("postgres")
@@ -56,6 +57,7 @@ def login():
 
     if request.method == 'POST':
         email, password = request.form['email'], request.form['password']
+        detect_attack(email); detect_attack(password)
 
         if User.exists(email, password):
             session['cart'] = list()    # Add 'cart' to the current user session.
@@ -67,6 +69,8 @@ def login():
             next = request.form['next']
             if next == 'None':
                 next = None
+            elif 'http' in next:
+                print 'Unvalidated Redirect detected!'
             return redirect(next or url_for('catalogue'))
 
         else:
@@ -99,6 +103,7 @@ def edit_account():
     if request.method == 'POST':
         current_user.update(request.form)
         message = 'Details updated successfully!'
+        detect_attack(request.form['password'])
 
     return render_template('edit.html',
                             message=message)
@@ -216,6 +221,8 @@ def comment():
     email = current_user.email
     product_id = request.form['product_id']
     comment = request.form['comment']
+
+    detect_attack(comment)
     DB.add_comment(email, product_id, comment)
     return redirect(url_for('details', id=product_id))
 
@@ -224,6 +231,8 @@ def comment():
 @login_required
 def search():
     query = request.args.get('query')
+
+    detect_attack(query)
     return catalogue(query=query)
 
 
@@ -247,6 +256,13 @@ def address():
     return "Your IP Address is: %s\n" % str(request.remote_addr)
 
 
+''' Methods below are not a part of the Main Website '''
+@app.route('/steal')
+def steal():
+    print 'Cookie stolen: ', request.args.get('cookie')
+    return 'Cookie stolen'
+
+
 def create_purchases_text(user_email, user_id):
     rows = DB.get_purchases(user_email)
     with open('purchase_records/'+str(user_id)+'.csv', 'w') as f:
@@ -254,7 +270,16 @@ def create_purchases_text(user_email, user_id):
             f.write('{}, {}\n'.format(row[0], row[1]))
 
 
-app.wsgi_app = ProxyFix(app.wsgi_app)
+def detect_attack(input):
+    if SQLIre.match(input):
+        print 'SQL Injection detected!'
+    elif XSSre1.match(input):
+        print 'XSS detected!'
+    elif XSSre2.match(input):
+        print 'XSS of type "<img src.." detected'
+
+
+#app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == '__main__':
     CONN_DETAILS = {
@@ -264,6 +289,11 @@ if __name__ == '__main__':
         'host': '127.0.0.1',
         'port': '5432'
     }
+
+#    SQLIre = re.compile("(\%27)|(\')|(\-\-)")
+    SQLIre = re.compile("[a-zA-Z0-9_ ]*((\%27)|(\'))([ ]*)((\%6F)|o|(\%4F))((\%72)|r|(\%52))", re.I)
+    XSSre1 = re.compile("[^<\%3C]*((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)", re.I)
+    XSSre2 = re.compile("[^<\%3C]*((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)", re.I)
 
     import models
     models.set_conn_details(CONN_DETAILS)

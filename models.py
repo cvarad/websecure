@@ -95,7 +95,8 @@ class User(UserMixin):
         conn = psycopg2.connect(**CONN_DETAILS)
         cur = conn.cursor()
         if password is None:
-            cur.execute("SELECT * FROM Users WHERE email='" + email + "';")
+            #cur.execute("SELECT * FROM Users WHERE email='" + email + "';")
+            cur.execute("SELECT * FROM Users WHERE email=(%s)", (email,))
         else:
             # Line vulnerable to SQL Injection
             cur.execute("SELECT * FROM Passwords WHERE email='" + email + "' AND password='" + password + "';")
