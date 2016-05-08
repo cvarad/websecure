@@ -279,7 +279,7 @@ def detect_attack(input):
         print 'XSS of type "<img src.." detected'
 
 
-#app.wsgi_app = ProxyFix(app.wsgi_app)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == '__main__':
     CONN_DETAILS = {
