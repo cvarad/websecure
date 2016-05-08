@@ -5,6 +5,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash, mak
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.contrib.fixers import ProxyFix
 from models import User, DB
+import logging
+import sys
 import os
 import psycopg2
 import random
@@ -30,6 +32,10 @@ except Exception as e:
 
 app = Flask(__name__)
 app.config.from_object('config')
+
+# For error logging. Temporary.
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
