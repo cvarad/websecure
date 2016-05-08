@@ -294,6 +294,11 @@ def detect_attack(input):
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
+#SQLIre = re.compile("(\%27)|(\')|(\-\-)")
+SQLIre = re.compile("[a-zA-Z0-9_ ]*((\%27)|(\'))([ ]*)((\%6F)|o|(\%4F))((\%72)|r|(\%52))", re.I)
+XSSre1 = re.compile("[^<\%3C]*((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)", re.I)
+XSSre2 = re.compile("[^<\%3C]*((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)", re.I)
+
 if __name__ == '__main__':
     CONN_DETAILS = {
         'database': 'mydb',
@@ -302,11 +307,6 @@ if __name__ == '__main__':
         'host': '127.0.0.1',
         'port': '5432'
     }
-
-#    SQLIre = re.compile("(\%27)|(\')|(\-\-)")
-    SQLIre = re.compile("[a-zA-Z0-9_ ]*((\%27)|(\'))([ ]*)((\%6F)|o|(\%4F))((\%72)|r|(\%52))", re.I)
-    XSSre1 = re.compile("[^<\%3C]*((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)", re.I)
-    XSSre2 = re.compile("[^<\%3C]*((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)", re.I)
 
     import models
     models.set_conn_details(CONN_DETAILS)
