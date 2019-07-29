@@ -1,4 +1,2 @@
 # websecure
-An intentionally unsecure website.
-
-https://websecure.herokuapp.com
+An intentionally unsecure website. https://websecure.herokuapp.com
